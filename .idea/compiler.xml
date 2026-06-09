@@ -9,6 +9,7 @@
         </processorPath>
         <module name="ecommerce-msa.order-service.main" />
         <module name="ecommerce-msa.product-service.main" />
+        <module name="ecommerce-msa.gateway-service.main" />
         <module name="ecommerce-msa.user-service.main" />
       </profile>
     </annotationProcessing>
@@ -16,6 +17,9 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="ecommerce-msa.gateway-service" options="-parameters" />
+      <module name="ecommerce-msa.gateway-service.main" options="-parameters" />
+      <module name="ecommerce-msa.gateway-service.test" options="-parameters" />
       <module name="ecommerce-msa.order-service" options="-parameters" />
       <module name="ecommerce-msa.order-service.main" options="-parameters" />
       <module name="ecommerce-msa.order-service.test" options="-parameters" />
