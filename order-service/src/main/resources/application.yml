@@ -2,6 +2,10 @@ server:
   port: 8083
 
 spring:
+  cloud:
+    compatibility-verifier:
+      enabled: false
+
   application:
     name: order-service
 
@@ -22,3 +26,6 @@ spring:
 
 jwt:
   secret: my-super-secret-key-for-jwt-signing-must-be-long-enough-256bits
+
+toss:
+  secret-key: test_sk_kYG57Eba3GbAKKGWmAWj8pWDOxmA

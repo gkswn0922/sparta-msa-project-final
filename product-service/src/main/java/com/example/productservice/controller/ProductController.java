@@ -35,4 +35,41 @@ public class ProductController {
   public ResponseEntity<ProductDto.Response> getProduct(@PathVariable Long id) {
     return ResponseEntity.ok(productService.getProduct(id));
   }
+
+  // 상품 수정
+  @PutMapping("/{id}")
+  public ResponseEntity<ProductDto.Response> updateProduct(
+          @PathVariable Long id,
+          @RequestBody ProductDto.UpdateRequest request) {
+    return ResponseEntity.ok(productService.updateProduct(id, request));
+  }
+
+  // 상품 삭제
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+    productService.deleteProduct(id);
+    return ResponseEntity.noContent().build();
+  }
+
+  // 재고 조회
+  @GetMapping("/{id}/stock")
+  public ResponseEntity<Integer> getStock(@PathVariable Long id) {
+    return ResponseEntity.ok(productService.getStock(id));
+  }
+
+  // 재고 차감
+  @PutMapping("/{id}/stock")
+  public ResponseEntity<Void> decreaseStock(
+          @PathVariable Long id,
+          @RequestParam int quantity) {
+    productService.decreaseStock(id, quantity);
+    return ResponseEntity.ok().build();
+  }
+
+  // 상품 검색
+  @GetMapping("/search")
+  public ResponseEntity<List<ProductDto.Response>> searchProducts(
+          @RequestParam String keyword) {
+    return ResponseEntity.ok(productService.searchProducts(keyword));
+  }
 }

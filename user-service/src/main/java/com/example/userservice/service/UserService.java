@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.TimeUnit;
 
@@ -71,4 +72,45 @@ public class UserService {
             .refreshToken(refreshToken)
             .build();
     }
+
+    // 내 정보 조회
+    public UserDto.MyInfoResponse getMyInfo(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다"));
+
+        return UserDto.MyInfoResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .name(user.getName())
+                .phone(user.getPhone())
+                .role(user.getRole())
+                .build();
+    }
+
+    // 내 정보 수정
+    @Transactional
+    public UserDto.MyInfoResponse updateMyInfo(Long userId, UserDto.UpdateRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다"));
+
+        user.update(request.getName(), request.getPhone());
+        return UserDto.MyInfoResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .name(user.getName())
+                .phone(user.getPhone())
+                .role(user.getRole())
+                .build();
+    }
+
+    // 회원 탈퇴
+    @Transactional
+    public void deleteMyInfo(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다"));
+
+        user.deactivate();
+        redisTemplate.delete("refreshToken:" + userId);
+    }
+
 }

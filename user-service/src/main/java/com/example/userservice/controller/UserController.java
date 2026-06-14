@@ -25,4 +25,24 @@ public class UserController {
         @Valid @RequestBody UserDto.LoginRequest request) {
         return ResponseEntity.ok(userService.login(request));
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserDto.MyInfoResponse> getMyInfo(
+            @RequestHeader("X-User-Id") Long userId) {
+        return ResponseEntity.ok(userService.getMyInfo(userId));
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<UserDto.MyInfoResponse> updateMyInfo(
+            @RequestHeader("X-User-Id") Long userId,
+            @RequestBody UserDto.UpdateRequest request) {
+        return ResponseEntity.ok(userService.updateMyInfo(userId, request));
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deleteMyInfo(
+            @RequestHeader("X-User-Id") Long userId) {
+        userService.deleteMyInfo(userId);
+        return ResponseEntity.noContent().build();
+    }
 }

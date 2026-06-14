@@ -54,4 +54,15 @@ public class User {
     public enum Role {
         USER, ADMIN
     }
+
+    public void update(String name, String phone) {
+        if (name != null) this.name = name;
+        if (phone != null) this.phone = phone;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void deactivate() {
+        this.isActive = false;
+        this.updatedAt = LocalDateTime.now();
+    }
 }

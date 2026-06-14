@@ -63,4 +63,26 @@ public class Product {
     SOLD_OUT,  // 품절
     DELETED    // 삭제
   }
+
+  public void update(String name, Integer price, Integer discountRate,
+                     String category, Integer stock, String description) {
+    if (name != null) this.name = name;
+    if (price != null) this.price = price;
+    if (discountRate != null) this.discountRate = discountRate;
+    if (category != null) this.category = category;
+    if (stock != null) this.stock = stock;
+    if (description != null) this.description = description;
+    this.updatedAt = LocalDateTime.now();
+  }
+
+  public void delete() {
+    this.status = Status.DELETED;
+    this.updatedAt = LocalDateTime.now();
+  }
+
+  public void decreaseStock(int quantity) {
+    this.stock -= quantity;
+    if (this.stock == 0) this.status = Status.SOLD_OUT;
+    this.updatedAt = LocalDateTime.now();
+  }
 }

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>결제 처리 중</title>
+    <style>
+        body { font-family: sans-serif; max-width: 500px; margin: 50px auto; padding: 20px; text-align: center; }
+        .success { color: #2e7d32; }
+        .error { color: #c62828; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 4px; text-align: left; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div id="result"></div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const paymentKey = params.get("paymentKey");
+        const orderIdRaw = params.get("orderId"); // ORDER-8-timestamp
+        const amount = params.get("amount");
+
+        // ORDER-8-timestamp 에서 숫자만 추출
+        const orderId = orderIdRaw.split("-")[1];
+
+        const resultDiv = document.getElementById("result");
+
+        if (paymentKey && orderId && amount) {
+            resultDiv.innerHTML = `<h2 class="success">결제 승인 중...</h2>`;
+
+            // 백엔드 결제 승인 API 호출
+            // Authorization 헤더에 Bearer 토큰 필요
+            const token = localStorage.getItem("accessToken") || prompt("JWT 토큰 입력:");
+
+            fetch("http://localhost:8080/api/payments", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: JSON.stringify({
+                    paymentKey: paymentKey,
+                    orderId: Number(orderIdRaw.split("-")[1]),
+                    tossOrderId: orderIdRaw, // ORDER-9-timestamp 그대로
+                    amount: Number(amount)
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                resultDiv.innerHTML = `
+                    <h2 class="success">✅ 결제 완료!</h2>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                console.log(orderIdRaw, orderId)
+            })
+            .catch(err => {
+                resultDiv.innerHTML = `<h2 class="error">❌ 결제 실패: ${err.message}</h2>`;
+            });
+        } else {
+            resultDiv.innerHTML = `<h2 class="error">❌ 잘못된 접근입니다</h2>`;
+        }
+    </script>
+</body>
+</html>

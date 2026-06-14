@@ -29,11 +29,23 @@ spring:
         - id: order-service
           uri: http://localhost:8083
           predicates:
-            - Path=/api/carts/**,/api/orders/**
+            - Path=/api/carts/**,/api/orders/**,/api/coupons/**,/api/payments/**
           filters:
             - name: AuthFilter
               args:
                 excludePaths:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:8083"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+            allowedHeaders: "*"
+
     compatibility-verifier:
       enabled: false
 

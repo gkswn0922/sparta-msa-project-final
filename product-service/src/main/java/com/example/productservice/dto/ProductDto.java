@@ -56,4 +56,16 @@ public class ProductDto {
           .build();
     }
   }
+
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class UpdateRequest {
+    private String name;
+    private Integer price;
+    private Integer discountRate;
+    private String category;
+    private Integer stock;
+    private String description;
+  }
 }

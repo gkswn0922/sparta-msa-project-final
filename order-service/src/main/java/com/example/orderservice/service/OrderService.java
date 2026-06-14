@@ -1,5 +1,6 @@
 package com.example.orderservice.service;
 
+import com.example.orderservice.client.ProductClient;
 import com.example.orderservice.dto.CartDto;
 import com.example.orderservice.dto.OrderDto;
 import com.example.orderservice.entity.Cart;
@@ -20,6 +21,7 @@ public class OrderService {
 
   private final OrderRepository orderRepository;
   private final CartRepository cartRepository;
+  private final ProductClient productClient;
 
   // 주문 생성 (장바구니 → 주문)
   @Transactional
@@ -34,6 +36,11 @@ public class OrderService {
     int totalAmount = cartItems.stream()
         .mapToInt(cart -> cart.getPrice() * cart.getQuantity())
         .sum();
+
+    // 재고 차감
+    cartItems.forEach(cart ->
+            productClient.decreaseStock(cart.getProductId(), cart.getQuantity())
+    );
 
     // 주문 생성
     Order order = Order.builder()
@@ -98,6 +105,16 @@ public class OrderService {
     }
 
     order.updateStatus(Order.Status.CANCELLED);
+    return OrderDto.Response.from(order);
+  }
+
+  // 주문 상태 변경 (관리자용)
+  @Transactional
+  public OrderDto.Response updateOrderStatus(Long orderId, Order.Status status) {
+    Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다"));
+
+    order.updateStatus(status);
     return OrderDto.Response.from(order);
   }
 }

@@ -1,6 +1,7 @@
 package com.example.orderservice.controller;
 
 import com.example.orderservice.dto.OrderDto;
+import com.example.orderservice.entity.Order;
 import com.example.orderservice.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -45,5 +46,13 @@ public class OrderController {
       @RequestHeader("X-User-Id") Long userId,
       @PathVariable Long orderId) {
     return ResponseEntity.ok(orderService.cancelOrder(userId, orderId));
+  }
+
+  // 주문 상태 변경 (관리자용)
+  @PatchMapping("/{orderId}/status")
+  public ResponseEntity<OrderDto.Response> updateOrderStatus(
+          @PathVariable Long orderId,
+          @RequestParam Order.Status status) {
+    return ResponseEntity.ok(orderService.updateOrderStatus(orderId, status));
   }
 }

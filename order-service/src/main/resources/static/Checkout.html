@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>토스페이 테스트 결제</title>
+    <script src="https://js.tosspayments.com/v1/payment"></script>
+    <style>
+        body { font-family: sans-serif; max-width: 500px; margin: 50px auto; padding: 20px; }
+        input { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
+        button { width: 100%; padding: 12px; background: #3182f6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #1b64da; }
+        label { font-size: 14px; color: #333; }
+    </style>
+</head>
+<body>
+    <h2>토스페이 테스트 결제</h2>
+
+    <label>주문 ID</label>
+    <input type="number" id="orderId" placeholder="주문 ID 입력" />
+
+    <label>결제 금액</label>
+    <input type="number" id="amount" placeholder="결제 금액 입력" />
+
+    <label>주문명</label>
+    <input type="text" id="orderName" placeholder="예: 나이키 에어맥스" />
+
+    <br/><br/>
+    <button onclick="pay()">결제하기</button>
+
+    <script>
+        const clientKey = "test_ck_24xLea5zVAlReG1k6Nzb3QAMYNwW";
+        const tossPayments = TossPayments(clientKey);
+
+        function pay() {
+            const orderId = document.getElementById("orderId").value;
+            const amount = document.getElementById("amount").value;
+            const orderName = document.getElementById("orderName").value;
+
+            if (!orderId || !amount || !orderName) {
+                alert("모든 항목을 입력해주세요");
+                return;
+            }
+
+            tossPayments.requestPayment("카드", {
+                amount: Number(amount),
+                orderId: "ORDER-" + orderId + "-" + Date.now(), // 이렇게 수정
+                orderName: orderName,
+                successUrl: "http://localhost:8083/Success.html",
+                failUrl: "http://localhost:8083/fail.html",
+            });
+        }
+    </script>
+</body>
+</html>

@@ -57,4 +57,22 @@ public class UserDto {
         private String accessToken;
         private String refreshToken;
     }
+
+    @Getter
+    @Builder
+    public static class MyInfoResponse {
+        private Long id;
+        private String email;
+        private String name;
+        private String phone;
+        private com.example.userservice.entity.User.Role role;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateRequest {
+        private String name;
+        private String phone;
+    }
 }

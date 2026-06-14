@@ -22,3 +22,5 @@ spring:
 
 jwt:
   secret: my-super-secret-key-for-jwt-signing-must-be-long-enough-256bits
+  access-token-expiration: 1800000
+  refresh-token-expiration: 604800000
