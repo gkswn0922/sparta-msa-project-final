@@ -4,9 +4,11 @@ import com.example.orderservice.client.ProductClient;
 import com.example.orderservice.dto.CartDto;
 import com.example.orderservice.dto.OrderDto;
 import com.example.orderservice.entity.Cart;
+import com.example.orderservice.entity.Coupon;
 import com.example.orderservice.entity.Order;
 import com.example.orderservice.entity.OrderItem;
 import com.example.orderservice.repository.CartRepository;
+import com.example.orderservice.repository.CouponRepository;
 import com.example.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,9 @@ public class OrderService {
   private final OrderRepository orderRepository;
   private final CartRepository cartRepository;
   private final ProductClient productClient;
+  private final CouponRepository couponRepository;
+  private final StockLockService stockLockService;
+
 
   // 주문 생성 (장바구니 → 주문)
   @Transactional
@@ -37,9 +42,34 @@ public class OrderService {
         .mapToInt(cart -> cart.getPrice() * cart.getQuantity())
         .sum();
 
+    // 쿠폰 검증 및 할인 계산
+    Coupon coupon = null;
+    int discountAmount = 0;
+
+    if (request.getCouponCode() != null && !request.getCouponCode().isBlank()) {
+      coupon = couponRepository.findByCode(request.getCouponCode())
+          .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 쿠폰입니다"));
+      coupon.validate(userId, totalAmount);
+      discountAmount = coupon.calculateDiscount(totalAmount);
+    }
+
+    int finalAmount = Math.max(0, totalAmount - discountAmount);
+
+
+    // 재고 차감 전에 먼저 검증
+    for (Cart cart : cartItems) {
+      int stock = productClient.getStock(cart.getProductId());
+      if (stock < cart.getQuantity()) {
+        throw new IllegalArgumentException(
+            "[" + cart.getProductName() + "] 재고 부족. " +
+                "현재: " + stock + "개, 요청: " + cart.getQuantity() + "개"
+        );
+      }
+    }
+
     // 재고 차감
     cartItems.forEach(cart ->
-            productClient.decreaseStock(cart.getProductId(), cart.getQuantity())
+        stockLockService.decreaseStockWithLock(cart.getProductId(), cart.getQuantity())
     );
 
     // 주문 생성

@@ -21,6 +21,8 @@ public class OrderDto {
 
     @NotBlank
     private String address;
+    private String couponCode;
+
   }
 
   @Getter

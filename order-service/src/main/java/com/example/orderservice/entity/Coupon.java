@@ -61,15 +61,27 @@ public class Coupon {
     }
 
     public void use() {
-        if (isUsed) throw new IllegalArgumentException("이미 사용된 쿠폰입니다");
-        if (expiredAt.isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("만료된 쿠폰입니다");
-        }
         this.isUsed = true;
     }
 
     public enum DiscountType {
         PERCENTAGE, // 정률 (%)
         FIXED       // 정액 (원)
+    }
+
+    public void validate(Long userId, int orderAmount) {
+        if (this.userId != null && !this.userId.equals(userId)) {
+            throw new IllegalArgumentException("본인 쿠폰만 사용할 수 있습니다");
+        }
+        if (isUsed) {
+            throw new IllegalArgumentException("이미 사용된 쿠폰입니다");
+        }
+        if (expiredAt.isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("만료된 쿠폰입니다");
+        }
+        if (orderAmount < minOrderAmount) {
+            throw new IllegalArgumentException(
+                "최소 주문금액 " + minOrderAmount + "원 이상이어야 합니다");
+        }
     }
 }
