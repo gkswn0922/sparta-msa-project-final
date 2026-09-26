@@ -2,6 +2,12 @@ server:
   port: 8080
 
 spring:
+  config:
+    # 로컬 실행 시 루트 .env를 읽는다 (컨테이너/CI에서는 파일이 없으므로 무시됨)
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:../.env[.properties]
+
   application:
     name: gateway-service
 
@@ -60,4 +66,4 @@ spring:
 
 
 jwt:
-  secret: my-super-secret-key-for-jwt-signing-must-be-long-enough-256bits
+  secret: ${JWT_SECRET}

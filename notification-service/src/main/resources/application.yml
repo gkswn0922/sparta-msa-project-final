@@ -2,13 +2,19 @@ server:
   port: 8084
 
 spring:
+  config:
+    # 로컬 실행 시 루트 .env를 읽는다 (컨테이너/CI에서는 파일이 없으므로 무시됨)
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:../.env[.properties]
+
   application:
     name: notification-service
 
   datasource:
     url: jdbc:postgresql://localhost:5433/notification_db
     username: ecommerce
-    password: ecommerce1234
+    password: ${DB_PASSWORD:ecommerce1234}
     driver-class-name: org.postgresql.Driver
 
   jpa:
