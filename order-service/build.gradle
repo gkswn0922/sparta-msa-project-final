@@ -13,4 +13,5 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation 'org.redisson:redisson-spring-boot-starter:3.27.2'
+    implementation 'org.springframework.kafka:spring-kafka'
 }

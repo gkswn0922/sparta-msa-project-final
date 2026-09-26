@@ -3,15 +3,19 @@ package com.example.orderservice.service;
 import com.example.orderservice.dto.PaymentDto;
 import com.example.orderservice.entity.Order;
 import com.example.orderservice.entity.Payment;
+import com.example.orderservice.event.PaymentCompletedEvent;
+import com.example.orderservice.event.PaymentRefundedEvent;
 import com.example.orderservice.repository.OrderRepository;
 import com.example.orderservice.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +27,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
     private final RestTemplate restTemplate;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Value("${toss.secret-key}")
     private String tossSecretKey;
@@ -85,6 +90,10 @@ public class PaymentService {
         paymentRepository.save(payment);
         order.updateStatus(Order.Status.PAID);
 
+        eventPublisher.publishEvent(new PaymentCompletedEvent(
+                order.getId(), userId, payment.getAmount(), payment.getPaymentMethod(), LocalDateTime.now()
+        ));
+
         return PaymentDto.Response.from(payment);
     }
 
@@ -103,6 +112,10 @@ public class PaymentService {
 
         payment.refund();
         order.updateStatus(Order.Status.CANCELLED);
+
+        eventPublisher.publishEvent(new PaymentRefundedEvent(
+                order.getId(), userId, payment.getAmount(), payment.getPaymentMethod(), LocalDateTime.now()
+        ));
 
         return PaymentDto.Response.from(payment);
     }
