@@ -13,6 +13,7 @@ subprojects {
 	apply plugin: 'java'
 	apply plugin: 'org.springframework.boot'
 	apply plugin: 'io.spring.dependency-management'
+	apply plugin: 'jacoco'
 
 	java {
 		toolchain {
@@ -35,7 +36,24 @@ subprojects {
 		}
 	}
 
+	jacoco {
+		toolVersion = '0.8.13'
+	}
+
 	tasks.named('test') {
 		useJUnitPlatform()
+		finalizedBy 'jacocoTestReport' // 테스트가 끝나면 커버리지 리포트 생성
+	}
+
+	tasks.named('jacocoTestReport') {
+		dependsOn 'test'
+		reports {
+			html.required = true // 사람이 보는 용도: build/reports/jacoco/test/html/index.html
+			xml.required = true  // CI 도구가 읽는 용도
+		}
+		// main() 만 있는 부트스트랩 클래스는 측정 대상에서 제외
+		classDirectories.setFrom(sourceSets.main.output.classesDirs.asFileTree.matching {
+			exclude '**/*Application*'
+		})
 	}
 }
