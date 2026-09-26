@@ -34,6 +34,15 @@ spring:
             - name: AuthFilter
               args:
                 excludePaths:
+
+        - id: notification-service
+          uri: http://notification-service:8084
+          predicates:
+            - Path=/api/notifications/**
+          filters:
+            - name: AuthFilter
+              args:
+                excludePaths:
       globalcors:
         cors-configurations:
           '[/**]':

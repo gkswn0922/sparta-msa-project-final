@@ -1,0 +1,35 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: notification-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/notification_db
+    username: ecommerce
+    password: ecommerce1234
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: notification-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.example.notificationservice.event
+        # order-service의 JsonSerializer가 실어 보내는 __TypeId__ 헤더(order-service 쪽 FQCN)를 무시하고
+        # notification-service에 정의된 로컬 PaymentEvent 타입으로 항상 역직렬화한다.
+        spring.json.use.type.headers: false
+        spring.json.value.default.type: com.example.notificationservice.event.PaymentEvent
